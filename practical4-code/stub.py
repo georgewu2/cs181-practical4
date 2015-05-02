@@ -7,6 +7,8 @@ class Learner:
 
     def __init__(self):
         self.last_state  = None
+        self.pixelsize   = 10
+        self.screen_height = 400
         self.last_action = None
         self.last_reward = None
 
@@ -14,6 +16,12 @@ class Learner:
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
+
+    def convert_to_q(state):
+        m_pos = ceil(state['monkey']['top']/self.pixelsize)
+        t_pos = ceil(state['tree']['top']/self.pixelsize)
+
+        return ((self.screen_height/self.pixelsize)*m_pos + t_pos)
 
     def action_callback(self, state):
         '''Implement this function to learn things and take actions.
