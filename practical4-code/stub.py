@@ -1,4 +1,5 @@
 import numpy.random as npr
+import numpy as np
 import sys
 
 from SwingyMonkey import SwingyMonkey
@@ -11,25 +12,27 @@ class Learner:
         self.screen_height = 400
         self.last_action = None
         self.last_reward = None
-        self.learning_rate = None
-        self.decay_rate = None
-        self.Q = 
+        self.learning_rate = 0.5
+        self.decay_rate = 0.5
+        self.Q = np.zeros((1700,2))
+
 
     def reset(self):
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
 
-    def convert_to_q(state):
-        m_pos = ceil(state['monkey']['top']/self.pixelsize)
-        t_pos = ceil(state['tree']['top']/self.pixelsize)
-
+    def convert_to_q(self, state):
+        m_pos = np.floor(state['monkey']['top']/self.pixelsize)
+        t_pos = np.floor(state['tree']['top']/self.pixelsize)
         return ((self.screen_height/self.pixelsize)*m_pos + t_pos)
 
-    def update_Q(s, a):
-        prev_state_index = convert_to_Q(self.last_state)
-        current_state_index = convert_to_Q(s)
-        Q(prev_state_index, a) += self.learning_rate * (self.last_reward + self.decay_rate * (max(Q(current_state_index,0), Q(current_state_index,1))) - Q(prev_state_index,a))
+    def update_Q(self, s, a):
+        if self.last_state == None:
+            return
+        prev_state_index = self.convert_to_q(self.last_state)
+        current_state_index = self.convert_to_q(s)
+        self.Q[prev_state_index][a] += self.learning_rate * (self.last_reward + self.decay_rate * (max(self.Q[current_state_index][0], self.Q[current_state_index][1])) - self.Q[prev_state_index][a])
 
     def action_callback(self, state):
         '''Implement this function to learn things and take actions.
@@ -40,9 +43,14 @@ class Learner:
         # You'll need to take an action, too, and return it.
         # Return 0 to swing and 1 to jump.
 
-
-
-        new_action = npr.rand() < 0.1
+        self.update_Q(state, self.last_action)
+        index = self.convert_to_q(state)
+        if self.Q[index][0] > self.Q[index][1]:
+            new_action = 0
+        elif self.Q[index][0] < self.Q[index][1]:
+            new_action = 1
+        else:
+            new_action = npr.rand() < 0.1
         new_state  = state
 
         self.last_action = new_action
@@ -55,7 +63,7 @@ class Learner:
 
         self.last_reward = reward
 
-iters = 100
+iters = 1000
 learner = Learner()
 
 for ii in xrange(iters):
