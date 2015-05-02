@@ -25,11 +25,16 @@ class Learner:
         self.total = 0
 
     def convert_to_q(self, state):
-        m_top = np.ceil(state['monkey']['top']/self.pixelsize)
-        t_top = np.ceil(state['tree']['top']/self.pixelsize)
-        m_bottom = np.floor(state['monkey']['bot']/self.pixelsize)
-        t_bottom = np.ceil(state['tree']['bot']/self.pixelsize)
-        return (m_bottom)
+        m_pos = np.floor(state['monkey']['top']/self.pixelsize)
+        t_pos = np.floor(state['tree']['top']/self.pixelsize)
+
+        m_near_top = state['monkey']['top'] > 350 
+        m_near_bot = state['monkey']['bot'] < 50
+        m_far_below = m_pos < (t_pos-2)
+        #m_close     = np.floor(state['tree']['dist']/(2*self.pixelsize))
+        m_close    = state['tree']['dist'] < 100
+        m_vel       = state['monkey']['vel'] > 0
+        return ((m_near_top, m_near_bot,m_pos-t_pos,m_close, m_vel))
 
     def update_Q(self, s, a):
         if self.last_state == None:
@@ -64,9 +69,9 @@ class Learner:
             elif self.Q[index][0] < self.Q[index][1]:
                 new_action = 1
             else:
-                new_action = npr.rand() < 0.1
+                new_action = npr.rand() < 0
         else:
-            new_action = npr.rand() < 0.1
+            new_action = npr.rand() < 0
         new_state  = state
 
         self.last_action = new_action
