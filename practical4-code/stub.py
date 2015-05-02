@@ -80,7 +80,7 @@ class Learner:
         return self.total
 
 iters = 100
-learner = Learner(iters)
+learner = Learner()
 with open('score_history.csv', 'w') as soln_fh:
     soln_csv = csv.writer(soln_fh,delimiter=' ',quotechar='"',quoting=csv.QUOTE_MINIMAL)
 
