@@ -13,7 +13,7 @@ class Learner:
         self.screen_height = 400
         self.last_action = None
         self.last_reward = None
-        self.learning_rate = 1
+        self.learning_rate = 0.5
         self.decay_rate = 1
         self.total = 0
         self.Q = dict()
@@ -50,6 +50,7 @@ class Learner:
         else:
             self.Q[prev_state_index] = [0,0]
             self.Q[prev_state_index][a] = self.learning_rate * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
+    
     def action_callback(self, state):
         '''Implement this function to learn things and take actions.
         Return 0 if you don't want to jump and 1 if you do.'''
@@ -82,8 +83,8 @@ class Learner:
     def reward_callback(self, reward):
         '''This gets called so you can see what reward you get.'''
         self.total = self.total + reward
-        if self.last_reward == 0:
-            self.last_reward = 5
+        # if self.last_reward == 0:
+        #     self.last_reward = 5
         self.last_reward = reward
 
 
