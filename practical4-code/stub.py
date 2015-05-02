@@ -9,7 +9,6 @@ class Learner:
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
-        self.Q = 
 
     def reset(self):
         self.last_state  = None
@@ -24,10 +23,13 @@ class Learner:
 
         # You'll need to take an action, too, and return it.
         # Return 0 to swing and 1 to jump.
+        qs = [self.Q[convert_to_q(state)][a] for a in [0,1]]
+        self.Q[convert_to_q(self.last_state)][self.last_action] = self.last_reward + max(qs)
+        # Q-Learning
+        q = [self.Q[convert_to_q(state)][a] for a in [0,1]]
+        new_action = q.index(max(Q))
 
-
-
-        new_action = npr.rand() < 0.1
+        # new_action = npr.rand() < 0.1
         new_state  = state
 
         self.last_action = new_action
