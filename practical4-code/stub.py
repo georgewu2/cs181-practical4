@@ -11,6 +11,8 @@ class Learner:
         self.screen_height = 400
         self.last_action = None
         self.last_reward = None
+        self.learning_rate = None
+        self.decay_rate = None
         self.Q = 
 
     def reset(self):
@@ -23,6 +25,11 @@ class Learner:
         t_pos = ceil(state['tree']['top']/self.pixelsize)
 
         return ((self.screen_height/self.pixelsize)*m_pos + t_pos)
+
+    def update_Q(s, a):
+        prev_state_index = convert_to_Q(self.last_state)
+        current_state_index = convert_to_Q(s)
+        Q(prev_state_index, a) += self.learning_rate * (self.last_reward + self.decay_rate * (max(Q(current_state_index,0), Q(current_state_index,1))) - Q(prev_state_index,a))
 
     def action_callback(self, state):
         '''Implement this function to learn things and take actions.
