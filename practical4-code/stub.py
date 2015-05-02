@@ -14,12 +14,14 @@ class Learner:
         self.last_reward = None
         self.learning_rate = 1
         self.decay_rate = 1
+        self.total = 0
         self.Q = dict()
 
     def reset(self):
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
+        self.total = 0
 
     def convert_to_q(self, state):
         m_pos = np.floor(state['monkey']['top']/self.pixelsize)
@@ -68,29 +70,38 @@ class Learner:
 
     def reward_callback(self, reward):
         '''This gets called so you can see what reward you get.'''
+        self.total = self.total + reward
         if self.last_reward == 0:
             return 1
         self.last_reward = reward
 
-iters = 1000
-learner = Learner()
 
-for ii in xrange(iters):
+    def total_reward(self):
+        return self.total
 
-    # Make a new monkey object.
-    swing = SwingyMonkey(sound=False,            # Don't play sounds.
-                         text="Epoch %d" % (ii), # Display the epoch on screen.
-                         tick_length=1,          # Make game ticks super fast.
-                         action_callback=learner.action_callback,
-                         reward_callback=learner.reward_callback)
+iters = 100
+learner = Learner(iters)
+with open('score_history.csv', 'w') as soln_fh:
+    soln_csv = csv.writer(soln_fh,delimiter=' ',quotechar='"',quoting=csv.QUOTE_MINIMAL)
 
-    # Loop until you hit something.
-    while swing.game_loop():
-        pass
+    for ii in xrange(iters):
 
-    # Reset the state of the learner.
-    learner.reset()
+        # Make a new monkey object.
+        swing = SwingyMonkey(sound=False,            # Don't play sounds.
+                             text="Epoch %d" % (ii), # Display the epoch on screen.
+                             tick_length=1,          # Make game ticks super fast.
+                             action_callback=learner.action_callback,
+                             reward_callback=learner.reward_callback)
 
+        # Loop until you hit something.
+        while swing.game_loop():
+            pass
+
+        # Save state
+        soln_csv.writerow([learner.total_reward()])
+
+        # Reset the state of the learner.
+        learner.reset()
 
 
     
