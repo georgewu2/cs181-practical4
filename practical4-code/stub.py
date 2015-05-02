@@ -25,9 +25,11 @@ class Learner:
         self.total = 0
 
     def convert_to_q(self, state):
-        m_pos = np.floor(state['monkey']['top']/self.pixelsize)
-        t_pos = np.floor(state['tree']['top']/self.pixelsize)
-        return ((self.screen_height/self.pixelsize)*(m_pos - t_pos), state['tree']['dist'])
+        m_top = np.ceil(state['monkey']['top']/self.pixelsize)
+        t_top = np.ceil(state['tree']['top']/self.pixelsize)
+        m_bottom = np.floor(state['monkey']['bot']/self.pixelsize)
+        t_bottom = np.ceil(state['tree']['bot']/self.pixelsize)
+        return (m_bottom)
 
     def update_Q(self, s, a):
         if self.last_state == None:
@@ -55,11 +57,14 @@ class Learner:
         self.update_Q(state, self.last_action)
 
         index = self.convert_to_q(state)
-        if index in self.Q and 0 in self.Q[index] and 1 in self.Q[index]:
+        if index in self.Q:
+            print self.Q[index]
             if self.Q[index][0] > self.Q[index][1]:
                 new_action = 0
             elif self.Q[index][0] < self.Q[index][1]:
                 new_action = 1
+            else:
+                new_action = npr.rand() < 0.1
         else:
             new_action = npr.rand() < 0.1
         new_state  = state
@@ -73,7 +78,7 @@ class Learner:
         '''This gets called so you can see what reward you get.'''
         self.total = self.total + reward
         if self.last_reward == 0:
-            return 1
+            self.last_reward = 5
         self.last_reward = reward
 
 
