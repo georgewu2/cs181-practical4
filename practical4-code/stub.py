@@ -13,7 +13,7 @@ class Learner:
         self.screen_height = 400
         self.last_action = None
         self.last_reward = None
-        self.learning_rate = 0.5
+        self.learning_rate = 0.75
         self.decay_rate = 1
         self.total = 0
         self.Q = dict()
@@ -64,7 +64,7 @@ class Learner:
 
         index = self.convert_to_q(state)
         if index in self.Q:
-            print self.Q[index]
+            # print self.Q[index]
             if self.Q[index][0] > self.Q[index][1]:
                 new_action = 0
             elif self.Q[index][0] < self.Q[index][1]:
@@ -91,11 +91,11 @@ class Learner:
     def total_reward(self):
         return self.total
 
-iters = 100
+iters = 75
 learner = Learner()
 with open('score_history.csv', 'w') as soln_fh:
     soln_csv = csv.writer(soln_fh,delimiter=' ',quotechar='"',quoting=csv.QUOTE_MINIMAL)
-
+    scores = []
     for ii in xrange(iters):
 
         # Make a new monkey object.
@@ -111,9 +111,10 @@ with open('score_history.csv', 'w') as soln_fh:
 
         # Save state
         soln_csv.writerow([learner.total_reward()])
-
+        scores.append(learner.total_reward())
         # Reset the state of the learner.
         learner.reset()
+    print np.mean(scores)
 
 
     
