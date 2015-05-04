@@ -14,10 +14,20 @@ class Learner:
         self.screen_height = 400
         self.last_action = None
         self.last_reward = None
+
+        # initial learning rate or alpha in Q-learning
         self.learning_rate = 0.25
+
+        # gamma in Q-learning
         self.decay_rate = 0.9
+
+        # total reward
         self.total = 0
+
+        # holds Q-values. keys are a 5-tuple defined by convert_to_q,
+        # and values are a list containing two entries, one for each action
         self.Q = dict()
+
         self.alphas = dict()
         self.iteration = 10
 
@@ -32,7 +42,7 @@ class Learner:
         m_pos = np.floor(state['monkey']['top']/self.pixelsize)
         t_pos = np.floor(state['tree']['top']/self.pixelsize)
 
-        m_near_top = state['monkey']['top'] > 350 
+        m_near_top = state['monkey']['top'] > 250
         m_near_bot = state['monkey']['bot'] < 50
         m_far_below = m_pos < (t_pos-2)
         #m_close     = np.floor(state['tree']['dist']/(2*self.pixelsize))
@@ -69,7 +79,6 @@ class Learner:
 
         index = self.convert_to_q(state)
         if index in self.Q:
-            # print self.Q[index]
             if self.Q[index][0] > self.Q[index][1]:
                 new_action = 0
             elif self.Q[index][0] < self.Q[index][1]:
@@ -80,6 +89,8 @@ class Learner:
             new_action = npr.rand() < 0
         
         if random.random() > 1-1.0/self.iteration:
+            print self.iteration
+            print new_action
             new_action = -1*new_action + 1
 
         new_state  = state
@@ -98,8 +109,6 @@ class Learner:
     def reward_callback(self, reward):
         '''This gets called so you can see what reward you get.'''
         self.total = self.total + reward
-        # if self.last_reward == 0:
-        #     self.last_reward = 5
         self.last_reward = reward
 
 
@@ -111,7 +120,7 @@ class Learner:
 
 iters = 150
 learner = Learner()
-with open('score_history.csv', 'wb') as soln_fh:
+with open('score_history_75.csv', 'wb') as soln_fh:
     soln_csv = csv.writer(soln_fh,delimiter=',',quotechar='"',quoting=csv.QUOTE_MINIMAL)
     scores = []
     for ii in xrange(iters):
