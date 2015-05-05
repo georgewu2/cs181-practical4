@@ -17,12 +17,15 @@ class GSLearner:
         self.decay_rate = decay
         self.total = 0
         self.Q = dict()
+        self.alphas = dict()
+        self.iteration = 10
 
-    def reset(self):
+    def reset(self, i):
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
         self.total = 0
+        self.iteration = (10+i)**2
 
     def convert_to_q(self, state):
         m_pos = np.floor(state['monkey']['top']/self.pixelsize)
@@ -33,6 +36,7 @@ class GSLearner:
         m_far_below = m_pos < (t_pos-2)
         #m_close     = np.floor(state['tree']['dist']/(2*self.pixelsize))
         m_close    = state['tree']['dist'] < 100
+        m_very_close    = state['tree']['dist'] < 50
         m_vel       = state['monkey']['vel'] > 0
         return ((m_near_top, m_near_bot,m_pos-t_pos,m_close, m_vel))
 
@@ -46,10 +50,11 @@ class GSLearner:
         else:   
             q_value = 0
         if prev_state_index in self.Q:
-            self.Q[prev_state_index][a] += self.learning_rate * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
+            self.Q[prev_state_index][a] += (self.learning_rate/self.alphas[prev_state_index][a]) * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
         else:
             self.Q[prev_state_index] = [0,0]
-            self.Q[prev_state_index][a] = self.learning_rate * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
+            self.Q[prev_state_index][a] = (self.learning_rate/self.alphas[prev_state_index][a]) * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
+    
     def action_callback(self, state):
         '''Implement this function to learn things and take actions.
         Return 0 if you don't want to jump and 1 if you do.'''
@@ -63,6 +68,7 @@ class GSLearner:
 
         index = self.convert_to_q(state)
         if index in self.Q:
+            # print self.Q[index]
             if self.Q[index][0] > self.Q[index][1]:
                 new_action = 0
             elif self.Q[index][0] < self.Q[index][1]:
@@ -71,7 +77,17 @@ class GSLearner:
                 new_action = npr.rand() < 0
         else:
             new_action = npr.rand() < 0
+        
+        if random.random() > 1-1.0/self.iteration:
+            new_action = -1*new_action + 1
+
         new_state  = state
+        new_state_index = self.convert_to_q(new_state)
+        if new_state_index in self.alphas:
+            self.alphas[new_state_index][new_action] += 1
+        else:
+            self.alphas[new_state_index] = [0,0]
+            self.alphas[new_state_index][new_action]  = 1
 
         self.last_action = new_action
         self.last_state  = new_state
@@ -81,8 +97,8 @@ class GSLearner:
     def reward_callback(self, reward):
         '''This gets called so you can see what reward you get.'''
         self.total = self.total + reward
-        if self.last_reward == 0:
-            self.last_reward = 5
+        # if self.last_reward == 0:
+        #     self.last_reward = 5
         self.last_reward = reward
 
 
