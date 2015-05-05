@@ -92,7 +92,7 @@ class GSLearner:
     def score(self):
         return self.last_state['score']
 
-iters = 100
+iters = 1
 alphas = [0.1,0.25,0.5,1]
 gammas = [0.1,0.25,0.5,1]
 ls = np.empty((len(alphas),len(gammas)), dtype=object)
@@ -103,11 +103,9 @@ for i in xrange(len(alphas)):
         stringrow += str(alphas[i])+"_"+str(gammas[i])+","
 
 with open('score_history.csv', 'wb') as soln_fh:
-    soln_csv = csv.writer(soln_fh,delimiter=',',quotechar='"',quoting=csv.QUOTE_MINIMAL)
-    soln_csv.writerow(stringrow)
+    soln_fh.write(stringrow+"\n")
 
     for ii in xrange(iters):
-        output = np.empty((len(alphas)*len(gammas),1))
         index = 0
         for i in xrange(len(alphas)):
             for j in xrange(len(gammas)):
@@ -125,9 +123,9 @@ with open('score_history.csv', 'wb') as soln_fh:
                     pass
 
                 # Save state
-                output[index] = learner.score()
+                soln_fh.write(str(learner.score())+",")
                 index += 1
 
                 # Reset the state of the learner.
                 learner.reset()
-        soln_csv.writerow(output)
+        soln_fh.write("\n")
