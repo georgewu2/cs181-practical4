@@ -1,5 +1,11 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{State Space}{}% 2
 \BOOKMARK [1][-]{section.3}{Q-Learning}{}% 3
-\BOOKMARK [1][-]{section.4}{Parameter Tuning}{}% 4
-\BOOKMARK [1][-]{section.5}{Conclusion}{}% 5
+\BOOKMARK [1][-]{section.4}{-Greedy}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Optimizing Step 2}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{Optimizing Step 3}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.3}{Modified -greedy Algorithm}{section.4}% 7
+\BOOKMARK [1][-]{section.5}{Parameter Tuning}{}% 8
+\BOOKMARK [2][-]{subsection.5.1}{State Space}{section.5}% 9
+\BOOKMARK [1][-]{section.6}{Conclusion}{}% 10
+\BOOKMARK [2][-]{subsection.6.1}{-Greedy}{section.6}% 11

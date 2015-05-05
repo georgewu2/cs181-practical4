@@ -39,7 +39,7 @@ class Learner:
         self.last_action = None
         self.last_reward = None
         self.total = 0
-        self.iteration = (1+i)**2
+        self.iteration = (1+i)
 
 
     def convert_to_q(self, state):
