@@ -28,24 +28,26 @@ class Learner:
         # and values are a list containing two entries, one for each action
         self.Q = dict()
 
+        # dictionary of values to scale down learning rates by
         self.alphas = dict()
-        self.iteration = 10
+
+        # for epsilon greedy
+        self.iteration = 100
 
     def reset(self, i):
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
         self.total = 0
-        self.iteration = (10+i)**2
+        self.iteration = (1+i)**2
 
     def convert_to_q(self, state):
         m_pos = np.floor(state['monkey']['top']/self.pixelsize)
         t_pos = np.floor(state['tree']['top']/self.pixelsize)
 
-        m_near_top = state['monkey']['top'] > 250
+        m_near_top = state['monkey']['top'] > 350
         m_near_bot = state['monkey']['bot'] < 50
         m_far_below = m_pos < (t_pos-2)
-        #m_close     = np.floor(state['tree']['dist']/(2*self.pixelsize))
         m_close    = state['tree']['dist'] < 100
         m_very_close    = state['tree']['dist'] < 50
         m_vel       = state['monkey']['vel'] > 0
@@ -88,10 +90,8 @@ class Learner:
         else:
             new_action = npr.rand() < 0
         
-        if random.random() > 1-1.0/self.iteration:
-            print self.iteration
-            print new_action
-            new_action = -1*new_action + 1
+        if random.random() < 1.0/self.iteration:
+            new_action = 1 - new_action
 
         new_state  = state
         new_state_index = self.convert_to_q(new_state)
@@ -120,7 +120,7 @@ class Learner:
 
 iters = 150
 learner = Learner()
-with open('score_history_75.csv', 'wb') as soln_fh:
+with open('score_history.csv', 'wb') as soln_fh:
     soln_csv = csv.writer(soln_fh,delimiter=',',quotechar='"',quoting=csv.QUOTE_MINIMAL)
     scores = []
     for ii in xrange(iters):
