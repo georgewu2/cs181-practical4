@@ -81,7 +81,15 @@ In addition, we found that having 10x10 blocks increased performance significant
 \includegraphics[width=100mm] {pixel_param}
 \]
 From this, we can see that having smaller blocks decreases variance drastically and increases the mean by a little bit. This decrease in variance can be explained by less monkeys missing trees by a little bit randomly.
-\section{Conclusion} 
+\section{Conclusion}
+We felt that we learned a lot about reinforcement learning in this practical. Although ideas such as Q-Learning are very nice on paper, in a murkier problem where the state space is not well defined, there can be a lot of different ways that people implement Q-Learning. In addition, although the problem seems very difficult at first glance, we saw how Q-Learning was able to capture a lot of the difficulty and leave us to tune its parameters such that the algorithm works. More specifically, for each of the portions of this practical, we felt like we took away:
+
+\subsection{State Space}
+Everything is feature selection. Feature selection is life.
+
+\subsection{Q-Learning}
+We realized while coding Q-Learning just how difficult realizing that there is a bug can be. After implementing Q-Learning the first time, we thought that we had gotten things correct and the rest of the practical would just be figuring out a good state space/improvements to the algorithm. It took us several hours to realize why our code was going so haywire was that our Q-Learning implementation actually had a bug in it.
+
 \subsection{$\epsilon$-Greedy}
 SwingyMonkey really defined the difference between theory and reality for us in terms of the $\epsilon$-Greedy extension. We covered in class that in theory, $\epsilon$-Greedy should only work with a variable on the order of $\frac{1}{n}$. However, realistically, because we could only run $100$ iterations and not $\infty$, we needed to use a more quickly vanishing $\epsilon$ to exploit the system enough by the time $100$ iterations ended.
 

@@ -8,4 +8,6 @@
 \BOOKMARK [1][-]{section.5}{Parameter Tuning}{}% 8
 \BOOKMARK [2][-]{subsection.5.1}{State Space}{section.5}% 9
 \BOOKMARK [1][-]{section.6}{Conclusion}{}% 10
-\BOOKMARK [2][-]{subsection.6.1}{-Greedy}{section.6}% 11
+\BOOKMARK [2][-]{subsection.6.1}{State Space}{section.6}% 11
+\BOOKMARK [2][-]{subsection.6.2}{Q-Learning}{section.6}% 12
+\BOOKMARK [2][-]{subsection.6.3}{-Greedy}{section.6}% 13
