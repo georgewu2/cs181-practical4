@@ -10,7 +10,7 @@ class Learner:
 
     def __init__(self):
         self.last_state  = None
-        self.pixelsize   = 20
+        self.pixelsize   = 10
         self.screen_height = 400
         self.last_action = None
         self.last_reward = None
@@ -41,32 +41,51 @@ class Learner:
         self.total = 0
         self.iteration = (1+i)**2
 
-    def convert_to_q(self, state):
-        m_pos = np.floor(state['monkey']['top']/self.pixelsize)
-        t_pos = np.floor(state['tree']['top']/self.pixelsize)
 
-        m_near_top = state['monkey']['top'] > 350
-        m_near_bot = state['monkey']['bot'] < 50
-        m_far_below = m_pos < (t_pos-2)
-        m_close    = state['tree']['dist'] < 100
-        m_very_close    = state['tree']['dist'] < 50
+    def convert_to_q(self, state):
+        """ Converts state into key for q dictionary
+        Takes in a state with structure defined in SwingyMonkey.py
+        Returns a 5-tuple consisting of:
+        (   <1 if top of monkey is above 300 pixels>,
+            <1 if bottom of monkey is below 50 pixels>,
+            <difference between top of monkey and top of tree>,
+            <1 if pixels to next tree trunk is less than 100>,
+            <1 if velocity of monkey is positive>
+            )
+        """
+        m_pos       = np.floor(state['monkey']['top']/self.pixelsize)
+        t_pos       = np.floor(state['tree']['top']/self.pixelsize)
+        m_near_top  = state['monkey']['top'] > 300
+        m_near_bot  = state['monkey']['bot'] < 50
+        m_close     = state['tree']['dist'] < 100
         m_vel       = state['monkey']['vel'] > 0
         return ((m_near_top, m_near_bot,m_pos-t_pos,m_close, m_vel))
 
     def update_Q(self, s, a):
+        """ Updates the relevant values of Q
+        This is called every time the state changes.
+        """
+        # On the first iteration we can't update Q, because we haven't transitioned to a
+        # different state.
         if self.last_state == None:
             return
-        prev_state_index = self.convert_to_q(self.last_state)
-        current_state_index = self.convert_to_q(s)
-        if current_state_index in self.Q:
-            q_value = max(self.Q[current_state_index][0], self.Q[current_state_index][1])
+
+        # get keys of both states
+        prev_state_key = self.convert_to_q(self.last_state)
+        current_state_key = self.convert_to_q(s)
+
+        # get the maximum q-values
+        if current_state_key in self.Q:
+            q_value = max(self.Q[current_state_key][0], self.Q[current_state_key][1])
         else:   
             q_value = 0
-        if prev_state_index in self.Q:
-            self.Q[prev_state_index][a] += (self.learning_rate/self.alphas[prev_state_index][a]) * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
+
+        # update the values
+        if prev_state_key in self.Q:
+            self.Q[prev_state_key][a] += (self.learning_rate/self.alphas[prev_state_key][a]) * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_key][a])
         else:
-            self.Q[prev_state_index] = [0,0]
-            self.Q[prev_state_index][a] = (self.learning_rate/self.alphas[prev_state_index][a]) * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_index][a])
+            self.Q[prev_state_key] = [0,0]
+            self.Q[prev_state_key][a] = (self.learning_rate/self.alphas[prev_state_key][a]) * (self.last_reward + self.decay_rate * q_value - self.Q[prev_state_key][a])
     
     def action_callback(self, state):
         '''Implement this function to learn things and take actions.
@@ -76,9 +95,11 @@ class Learner:
 
         # You'll need to take an action, too, and return it.
         # Return 0 to swing and 1 to jump.
-       
+        
+        # first update the q-value
         self.update_Q(state, self.last_action)
 
+        # decide the next action to take
         index = self.convert_to_q(state)
         if index in self.Q:
             if self.Q[index][0] > self.Q[index][1]:
@@ -86,13 +107,14 @@ class Learner:
             elif self.Q[index][0] < self.Q[index][1]:
                 new_action = 1
             else:
-                new_action = npr.rand() < 0
+                new_action = 0
         else:
-            new_action = npr.rand() < 0
+            new_action = 0
         
         if random.random() < 1.0/self.iteration:
             new_action = 1 - new_action
 
+        # update our alphas
         new_state  = state
         new_state_index = self.convert_to_q(new_state)
         if new_state_index in self.alphas:
