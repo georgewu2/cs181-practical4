@@ -32,14 +32,14 @@ class Learner:
         self.alphas = dict()
 
         # for epsilon greedy
-        self.iteration = 100
+        self.iteration = 1
 
     def reset(self, i):
         self.last_state  = None
         self.last_action = None
         self.last_reward = None
         self.total = 0
-        self.iteration = (1+i)
+        self.iteration = (1+i)**2
 
 
     def convert_to_q(self, state):
